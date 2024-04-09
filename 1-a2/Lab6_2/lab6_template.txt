@@ -1,0 +1,57 @@
+/**
+ * lab6_template.c
+ *
+ * Template file for CprE 288 Lab 6
+ *
+ * @author Diane Rover, 2/15/2020
+ *
+ */
+
+#include "Timer.h"
+#include "lcd.h"
+#include "cyBot_Scan.h"
+#include "uart-interrupt.h"
+
+
+#warning "Possible unimplemented functions"
+
+
+
+int main(void) {
+	timer_init(); // Must be called before lcd_init(), which uses timer functions
+	lcd_init();
+	uart_interrupt_init();
+	cyBOT_init_Scan(0b0011);
+
+	right_calibration_value = 280000;
+	left_calibration_value = 1256500;
+
+	// YOUR CODE HERE
+
+    int input;
+    int i;
+    cyBOT_Scan_t scan;
+	while(1)
+	{
+      // YOUR CODE HERE
+
+
+            if(input > 32 && input < 127) {
+
+                if(input == 'q'){
+                    for(i = 0; i <=180; i+=2) {
+
+                        if(input == 's'){
+                            break;
+                        }
+
+                        cyBOT_Scan(i, &scan);
+                }
+
+
+            }
+        }
+
+}
+
+}
