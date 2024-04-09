@@ -1,0 +1,11 @@
+"./Timer.obj"
+"./lcd.obj"
+"./main.obj"
+"./open_interface.obj"
+"./servo.obj"
+"./tm4c123gh6pm_startup_ccs.obj"
+"../libcybotScan.lib"
+"../libcybotUART.lib"
+"../tm4c123gh6pm.cmd"
+-l"C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/ccs/Debug/driverlib.lib"
+-llibc.a
