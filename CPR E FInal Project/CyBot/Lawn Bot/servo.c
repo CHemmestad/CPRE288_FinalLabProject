@@ -44,7 +44,11 @@ void servo_move2(uint16_t degrees) {
 //    TIMER1_TBPMR_R = 0x4;
     calcAngle(degrees);
     TIMER1_CTL_R |= 0x0100;
-    timer_waitMillis(2500);
+
+    //To Do: 
+    timer_waitMillis(2500); //Show have a way to calculate how long it will take the servo to move otherwise
+    //it will take forever to scan an area if we keep it like this
+    
     TIMER1_CTL_R &= ~0x0100;
 
 
