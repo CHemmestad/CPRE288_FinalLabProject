@@ -37,6 +37,7 @@ Last Updated: 04/18/24
 #include "adc.h"
 #include "ping_template.h"
 #include "servo.h"
+#include "sound.h"
 #include "AdditionalFunctions.h"
 
 //#warning "Possible unimplemented functions"
