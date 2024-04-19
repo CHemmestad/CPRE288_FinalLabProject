@@ -25,9 +25,12 @@ void template() { //copy and paste template to add your own sound
     oi_t *sensor_data = oi_alloc();
     oi_init(sensor_data);
     int index = 0;
+    //******************************************
+    //Only change these three lines
     int numNotes = 4; //Number of notes in your sound, MAX 64
-    unsigned char notes[4] = {64, 64, 64, 64}; //The notes that being played, 64 is an A
-    unsigned char duration[4] = {32, 32, 32, 32}; //The length the note is being played, 32 is a regular note length
+    unsigned char notes[4] = {64, 64, 64, 64}; //The notes that are being played, 69 is an A
+    unsigned char duration[4] = {32, 32, 32, 32}; //The length of the note that is being played, 32 is a regular note length
+    //******************************************
     oi_loadSong(index, numNotes, notes, duration);
     oi_play_song(index);
     free(sensor_data);
