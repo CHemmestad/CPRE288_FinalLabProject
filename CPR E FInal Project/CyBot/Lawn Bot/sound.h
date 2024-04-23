@@ -10,5 +10,11 @@
 
 void playZelda();
 void template();
+void objectDetectedSound();
+void dogDetectedSound();
+void bumpSound();
+void holeSound();
+void finishSound();
+void startSound();
 
 #endif /* SOUND_H_ */
