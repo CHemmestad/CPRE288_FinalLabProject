@@ -14,6 +14,6 @@
 #include <stdint.h>
 
 uint32_t borderDetected(oi_t *sensor_data);
-
+void moveForwardWithBorderDetect(oi_t *sensor_data, double distance_mm);
 
 #endif /* BORDERDETECT_H_ */
