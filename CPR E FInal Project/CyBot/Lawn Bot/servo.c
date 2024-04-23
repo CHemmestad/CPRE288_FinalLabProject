@@ -1,8 +1,12 @@
 #include  "servo.h"
 #include "Timer.h"
 #include "lcd.h"
+#include "button.h"
+#include "stdio.h"
 
 unsigned long pwm_period = 0x4E200;
+
+
 
 void servo_init(){
     SYSCTL_RCGCGPIO_R |= 0x02;
@@ -24,7 +28,7 @@ void servo_init(){
     TIMER1_TBMR_R = 0x0A;//enable pwm / configure for periodic mode.
 }
 
-void servo_move(uint16_t degrees){
+uint16_t servo_move(uint16_t degrees){
     float pulseCalculation = (degrees/180.0) + 1.0;
     //long matchValue = (320000 - (pulseCalculation * 16000));
     long matchValue = (320000 - (long)(pulseCalculation * 16000));
@@ -39,37 +43,61 @@ void servo_move(uint16_t degrees){
     timer_waitMillis(500);
     TIMER1_CTL_R &= ~0x100;
 
-
+    return degrees;
 }
 
-void calibrate_servo(){
- servo_move(90);
+void servo_calibrate(){
+    servo_move(90);
 
+    int dir = 1;
+    int cnt = 0;
     char msg[90];
 
     while(1){
         int button = button_getButton();
         switch(button){
-
-        //move 1 degree
         case 1:
+        TIMER1_CTL_R |= 0x100;
+        TIMER1_TBMATCHR_R += 10 * dir;
         break;
 
-        //move 5 degrees
         case 2:
+        TIMER1_CTL_R |= 0x100;
+        TIMER1_TBMATCHR_R += 100 * dir;
         break;
 
-        //switch counter-clockwise/clockwise
         case 3:
+        TIMER1_CTL_R |= 0x100;
+        if(cnt == 0){
+            dir = -1;
+            cnt = 1;
+        }
+        else if(cnt == 1){
+            dir = 1;
+            cnt = 0;
+        }
+
         break;
 
-        //next step
         case 4:
+        TIMER1_CTL_R |= 0x100;
+        TIMER1_TBMATCHR_R -= 100;
         break;
 
         default:
-
+        timer_waitMillis(100);
+        TIMER1_CTL_R &= ~0x100;
         break;
         }
+
+        if(cnt == 0){
+            sprintf(msg, "Match Value:\n%d \nDirection:\nclockwise", TIMER1_TBMATCHR_R);
+        }
+        else if(cnt == 1){
+            sprintf(msg, "Match Value:\n%ud \nDirection:\nc-clockwise", TIMER1_TBMATCHR_R);
+        }
+        lcd_printf("%s", msg);
     }
 }
+
+
