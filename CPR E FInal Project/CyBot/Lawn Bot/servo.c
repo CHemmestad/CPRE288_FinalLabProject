@@ -1,70 +1,75 @@
-/*
- * servo.c
- *
- *  Created on: Apr 2, 2024
- *      Author: cihem
- */
-
-#include "servo.h"
+#include  "servo.h"
 #include "Timer.h"
+#include "lcd.h"
 
-void calcAngle(int angle);
+unsigned long pwm_period = 0x4E200;
 
-void servo_init2(void) {
+void servo_init(){
     SYSCTL_RCGCGPIO_R |= 0x02;
     SYSCTL_RCGCTIMER_R |= 0x02;
-    while ((SYSCTL_RCGCTIMER_R & 0x02) == 0) {};
-
-    GPIO_PORTB_DEN_R |= 0x20;
-    GPIO_PORTB_DIR_R |= 0x20;
+    while ((SYSCTL_PRGPIO_R & 0x02) != 0x02) {};
+    GPIO_PORTB_DIR_R &= ~0x20;
     GPIO_PORTB_AFSEL_R |= 0x20;
-    GPIO_PORTB_PCTL_R &= 0xFFFF0FFF;
-    GPIO_PORTB_PCTL_R |= 0x00007000;
+    GPIO_PORTB_PCTL_R &= 0xFF7FFFFF;
+    GPIO_PORTB_PCTL_R |= 0x00700000;
+    GPIO_PORTB_DEN_R |= 0x20;
 
-    TIMER1_CTL_R &= ~0x0100;
+    //enable pwm mode
+    TIMER1_CTL_R &= ~0x100; //disable timer1b
+    TIMER1_CFG_R = 0x4; //configure to 16-bit mode
 
-    TIMER1_CFG_R = 0x04;
-    //TIMER1_TBMR_R &= 0xFFFFFFEF;
-    TIMER1_TBMR_R &= ~0x05;
-    TIMER1_TBMR_R |= 0x08;
-    TIMER1_TBMR_R |= 0x02;
-    TIMER1_TBPR_R |= 0x4;
-    TIMER1_TBILR_R |= 0xE200;
-    TIMER1_IMR_R |= 0x0200;
-    TIMER1_CTL_R |= 0x0C00;
+    TIMER1_TBPR_R = pwm_period >> 16; //extend timer range to 16bit
+    TIMER1_TBILR_R = pwm_period & 0xFFFF; //determine period of pwm
 
-    TIMER1_CTL_R |= 0x0100;
+    TIMER1_TBMR_R = 0x0A;//enable pwm / configure for periodic mode.
 }
 
-void servo_move2(uint16_t degrees) {
-    TIMER1_CTL_R &= ~0x0100;
-//    TIMER1_TBMATCHR_R = 0xA380;
-//    TIMER1_TBPMR_R = 0x4;
-//    TIMER1_TBMATCHR_R = 0xE200;
-//    TIMER1_TBPMR_R = 0x4;
-    calcAngle(degrees);
-    TIMER1_CTL_R |= 0x0100;
+void servo_move(uint16_t degrees){
+    float pulseCalculation = (degrees/180.0) + 1.0;
+    //long matchValue = (320000 - (pulseCalculation * 16000));
+    long matchValue = (320000 - (long)(pulseCalculation * 16000));
 
-    //To Do: 
-    timer_waitMillis(2500); //Show have a way to calculate how long it will take the servo to move otherwise
-    //it will take forever to scan an area if we keep it like this
-    
-    TIMER1_CTL_R &= ~0x0100;
+   // long pulseCalculation = ((degrees/180.0) + 1.0)/;
 
 
-//    GPIO_PORTB_DATA_R &= ~0x20;
-//    GPIO_PORTB_DATA_R |= 0x20;
-//    timer_waitMillis(1);
-//    GPIO_PORTB_DATA_R &= ~0x20;
+    TIMER1_TBMATCHR_R = matchValue & 0x00FFFF;
+    TIMER1_TBPMR_R = matchValue >> 16;
+
+    TIMER1_CTL_R |= 0x100; //enable timer1b
+    timer_waitMillis(500);
+    TIMER1_CTL_R &= ~0x100;
+
+
 }
 
-void calcAngle(int angle) {
-    double ms = (angle / 180.0) + 1;
-//    double clockCy = ((ms / 100) / .02) * 320000;
-//    int cyclesDown = 320000 - clockCy;
-    int cycLow = (20 - ms) / 6.25E-5;
-    int mask = cycLow & 0xFFFF;
-    TIMER1_TBMATCHR_R = mask;
-    mask = cycLow >> 16;
-    TIMER1_TBPMR_R = mask;
+void calibrate_servo(){
+ servo_move(90);
+
+    char msg[90];
+
+    while(1){
+        int button = button_getButton();
+        switch(button){
+
+        //move 1 degree
+        case 1:
+        break;
+
+        //move 5 degrees
+        case 2:
+        break;
+
+        //switch counter-clockwise/clockwise
+        case 3:
+        break;
+
+        //next step
+        case 4:
+        break;
+
+        default:
+
+        break;
+        }
+    }
 }
