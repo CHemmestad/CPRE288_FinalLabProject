@@ -6,6 +6,9 @@
 
 unsigned long pwm_period = 0x4E200;
 
+long matchVal0;
+long matchVal180;
+
 
 
 void servo_init(){
@@ -43,15 +46,18 @@ uint16_t servo_move(uint16_t degrees){
     timer_waitMillis(500);
     TIMER1_CTL_R &= ~0x100;
 
+
     return degrees;
 }
 
 void servo_calibrate(){
     servo_move(90);
 
-    int dir = 1;
+    int dir = -1;
     int cnt = 0;
     char msg[90];
+    int saveCount = 0;
+    char calVals[90];
 
     while(1){
         int button = button_getButton();
@@ -80,8 +86,15 @@ void servo_calibrate(){
         break;
 
         case 4:
-        TIMER1_CTL_R |= 0x100;
-        TIMER1_TBMATCHR_R -= 100;
+        if(saveCount == 0){
+            matchVal0 = TIMER1_TBMATCHR_R;
+            saveCount++;
+            timer_waitMillis(200);
+        }
+        else if(saveCount == 1){
+            matchVal180 = TIMER1_TBMATCHR_R;
+            saveCount++;
+        }
         break;
 
         default:
@@ -97,6 +110,13 @@ void servo_calibrate(){
             sprintf(msg, "Match Value:\n%ud \nDirection:\nc-clockwise", TIMER1_TBMATCHR_R);
         }
         lcd_printf("%s", msg);
+        if(saveCount >= 2){
+            sprintf(calVals, "Calibration Values:\nmatchVal_0: %d\nmatchVal_180: %d", matchVal0, matchVal180);
+            lcd_clear();
+            lcd_printf("%s", calVals);
+            TIMER1_CTL_R &= (~0x100);
+            return;
+        }
     }
 }
 
