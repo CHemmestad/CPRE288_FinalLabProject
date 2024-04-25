@@ -104,3 +104,20 @@ void startSound() {
         oi_play_song(index);
         free(sensor_data);
 }
+
+
+void playMarioSoundEffect()
+{
+    oi_t *sensor_data = oi_alloc();
+    oi_init(sensor_data);
+
+    int index = 0;
+
+    int numNotes = 9;
+    unsigned char notes[] = {
+        84, 83, 81, 79, 78, 76, 79, 78, 76};
+
+    unsigned char durations[] = {8, 8, 16, 16, 16, 32, 16, 16, 32};
+
+    oi_loadSong
+}
