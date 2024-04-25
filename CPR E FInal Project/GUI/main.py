@@ -8,7 +8,7 @@ This program will map the area by using the information that the cybot sends it 
 calculate where to move the cybot and then send the instructions to the cybot
 This program is also responsible for displaying the information to the user using graphics
 """
-
+import socket
 import tkinter as tk
 import math
 
@@ -16,18 +16,44 @@ def move_roomba(event):
     global cybotAngle, direction, cyBotX, cyBotY, leftSensor, rightSensor, topLeftSensor, topRightSensor, canvas
     key = event.keysym
     dx, dy = 0, 0
-    if key == "w":
-        dy = -gridSize * math.cos(math.radians(cybotAngle))  # Move forward
-        dx = gridSize * math.sin(math.radians(cybotAngle)) 
+    if key == "m":
+        s.sendall(key.encode())
+        angle = s.recv(3)
+        distance = s.recv(2)
+        print(angle.decode())
+        print(distance.decode())
+        while int(angle) < 180:
+            angle = int(s.recv(3))
+            distance = int(s.recv(2))
+            angleAdj = angle*-1 + 90
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            if distance < 30:
+                leftSensor = canvas_widget.create_oval(
+                (cyBotX + distance*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - 12 - distance*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + distance*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - 12 - distance*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='red')
+            print(angle)
+            print(distance)
+    elif key == "p":
+        s.sendall(key.encode())
+    elif key == "w":
+        s.sendall(key.encode())
+        distance = int(s.recv(3))/10
+        dy = -distance * gridSize * math.cos(math.radians(cybotAngle))  # Move forward
+        dx = distance * gridSize * math.sin(math.radians(cybotAngle)) 
     elif key == "a":
-        cybotAngle = (cybotAngle - 5) # turns left
+        s.sendall(key.encode())
+        cybotAngle = (cybotAngle - int(s.recv(3))) # turns left
         if cybotAngle < 0:
             cybotAngle = 360
     elif key == "s":
-        dy = gridSize * math.cos(math.radians(cybotAngle))   # Move backward
-        dx = -gridSize * math.sin(math.radians(cybotAngle)) 
+        s.sendall(key.encode())
+        distance = int(s.recv(3))/10
+        dy = distance * gridSize * math.cos(math.radians(cybotAngle))   # Move backward
+        dx = -distance * gridSize * math.sin(math.radians(cybotAngle)) 
     elif key == "d":
-        cybotAngle = (cybotAngle + 5)%360  # turns right
+        s.sendall(key.encode())
+        cybotAngle = (cybotAngle - int(s.recv(3)))%360  # turns right
     elif key == "space":
         canvas_widget.create_oval((cyBotX*gridSize)-10 + 1, (cyBotY*gridSize)-10, (cyBotX*gridSize)+10 + 1, (cyBotY*gridSize)+10, outline="", fill='red')
     print(cybotAngle)
@@ -69,7 +95,7 @@ def move_roomba(event):
         (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
         (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
         outline="", fill='yellow')
-    speed = 3
+    speed = 1
     dy *= speed
     dx *= speed
     canvas[int(cyBotY)][int(cyBotX)] = 0
@@ -94,38 +120,32 @@ def move_roomba(event):
     canvas_widget.move(rightSensor, dx, dy)
     canvas_widget.move(topLeftSensor, dx, dy)
     canvas_widget.move(topRightSensor, dx, dy)
-"""
-import socket
 
 # WiFi module IP address and port
-wifi_module_ip = '192.168.1.1'
-wifi_module_port = 288
+host = '192.168.1.1'
+port = 288
 
-# Create a socket object
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((host, port))
 
-# Connect to the WiFi module
-s.connect((wifi_module_ip, wifi_module_port))
+#s.sendall(b'm')
 
+"""
 while True:
-    # Get user input
-    userInput = input('Enter Something: ')
-    
-    # Send user input to the socket
+    userInput = input('Enter something: ')
     s.sendall(userInput.encode())
-
-    # Receive data from the socket
-    data = s.recv(1024)
-    
-    # Check if there is no more data to receive
-    if not data:
+    if userInput == "z":
         break
-
-    # Print the received data
-    print("Received:", data.decode())
-
-# Close the socket
-s.close()
+userInput = input('Enter something: ')
+s.sendall(userInput.encode())
+while True:
+    angle = s.recv(3)
+    distance = s.recv(2)
+    if angle.decode() == "s":
+        print('Broke')
+        break
+    print(angle.decode())
+    print(distance.decode())
 """
 
 rows, cols = 300, 500
@@ -208,3 +228,4 @@ root.bind("<KeyPress>", move_roomba)
 
 # Start the GUI event loop
 root.mainloop()
+s.close()
