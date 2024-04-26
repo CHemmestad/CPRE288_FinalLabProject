@@ -1,5 +1,5 @@
 Contributors:
-Alexander Svobodny
-Caleb Hemmestad
-Billy Dang
-Kaden Berger
+Alexander Svobodny,
+Caleb Hemmestad,
+Billy Dang,
+Kaden Berger,
