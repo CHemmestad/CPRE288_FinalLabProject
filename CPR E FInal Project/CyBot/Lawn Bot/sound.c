@@ -48,7 +48,7 @@ void objectDetectedSound() {
 void dogDetectedSound() {
     oi_t *sensor_data = oi_alloc();
     oi_init(sensor_data);
-int index = 0;
+    int index = 0;    
    int numNotes = 4; //Number of notes in your sound, MAX 64
    unsigned char notes[4] = {57, 57, 57, 57}; //The notes that being played, 64 is an A
    unsigned char duration[4] = {32, 47, 55, 57}; //The length the note is being played, 32 is a regular note length
@@ -71,38 +71,38 @@ void bumpSound() {
 
 void holeSound() {
     oi_t *sensor_data = oi_alloc();
-        oi_init(sensor_data);
-        int index = 0;
-        int numNotes = 6; //Number of notes in your sound, MAX 64
-        unsigned char notes[6] = {71, 81, 61, 61, 67, 66}; //The notes that being played, 64 is an A
-        unsigned char duration[6] = {8, 8, 4, 8, 16, 16}; //The length the note is being played, 32 is a regular note length
-        oi_loadSong(index, numNotes, notes, duration);
-        oi_play_song(index);
-        free(sensor_data);
+    oi_init(sensor_data);
+    int index = 0;
+    int numNotes = 6; //Number of notes in your sound, MAX 64
+    unsigned char notes[6] = {71, 81, 61, 61, 67, 66}; //The notes that being played, 64 is an A
+    unsigned char duration[6] = {8, 8, 4, 8, 16, 16}; //The length the note is being played, 32 is a regular note length
+    oi_loadSong(index, numNotes, notes, duration);
+    oi_play_song(index);
+    free(sensor_data);
 }
 
 void finishSound() {
     oi_t *sensor_data = oi_alloc();
-        oi_init(sensor_data);
-        int index = 0;
-        int numNotes = 10; //Number of notes in your sound, MAX 64
-        unsigned char notes[12] = {74, 74, 81, 74, 74, 83, 74, 74, 81, 74, 74, 80}; //The notes that being played, 64 is an A
-        unsigned char duration[12] = {8, 8, 16, 8, 8, 16, 8, 8, 16, 8, 8, 16}; //The length the note is being played, 32 is a regular note length
-        oi_loadSong(index, numNotes, notes, duration);
-        oi_play_song(index);
-        free(sensor_data);
+    oi_init(sensor_data);
+    int index = 0;
+    int numNotes = 10; //Number of notes in your sound, MAX 64
+    unsigned char notes[12] = {74, 74, 81, 74, 74, 83, 74, 74, 81, 74, 74, 80}; //The notes that being played, 64 is an A
+    unsigned char duration[12] = {8, 8, 16, 8, 8, 16, 8, 8, 16, 8, 8, 16}; //The length the note is being played, 32 is a regular note length
+    oi_loadSong(index, numNotes, notes, duration);
+    oi_play_song(index);
+    free(sensor_data);
 }
 
 void startSound() {
     oi_t *sensor_data = oi_alloc();
-        oi_init(sensor_data);
-        int index = 0;
-        int numNotes = 31; //Number of notes in your sound, MAX 64
-        unsigned char notes[31] = {71, 83, 78, 76, 83, 77, 76, 74, 80, 78, 72, 77, 81, 77, 71, 81, 77, 76, 74, 76, 77, 77, 76, 76, 78, 80, 80, 80, 81, 81, 83}; //The notes that being played, 64 is an A
-        unsigned char duration[31] = {8, 8, 8, 8, 4, 8, 16, 8, 8, 8, 8, 4, 8, 16, 8, 8, 8, 8, 4, 8, 16, 4, 8, 8, 4, 8, 8, 4, 8, 8, 16}; //The length the note is being played, 32 is a regular note length
-        oi_loadSong(index, numNotes, notes, duration);
-        oi_play_song(index);
-        free(sensor_data);
+    oi_init(sensor_data);
+    int index = 0;
+    int numNotes = 31; //Number of notes in your sound, MAX 64
+    unsigned char notes[31] = {71, 83, 78, 76, 83, 77, 76, 74, 80, 78, 72, 77, 81, 77, 71, 81, 77, 76, 74, 76, 77, 77, 76, 76, 78, 80, 80, 80, 81, 81, 83}; //The notes that being played, 64 is an A
+    unsigned char duration[31] = {8, 8, 8, 8, 4, 8, 16, 8, 8, 8, 8, 4, 8, 16, 8, 8, 8, 8, 4, 8, 16, 4, 8, 8, 4, 8, 8, 4, 8, 8, 16}; //The length the note is being played, 32 is a regular note length
+    oi_loadSong(index, numNotes, notes, duration);
+    oi_play_song(index);
+    free(sensor_data);
 }
 
 void playRickRoll()
@@ -111,25 +111,22 @@ void playRickRoll()
     oi_init(sensor_data);
     int index = 0;
     int numNotes = 128;
-    unsigned char notes[] = {64, 66, 67, 67, 57, 77, 0, 64, 64, 66, 67, 62, 74, 74, 57, 0, 64, 64, 66, 67, 64, 67, 57, 66, 64, 62, 64, 64, 66, 67, 0, 64, 62, 57, 57, 57, 59, 57, 67, 57, 59, 67, 57, 57, 57, 59, 57, 62, 8, 64, 66, 67, 64, 57, 59, 57, 0, 62, 64, 67, 64, 59, 59, 57, 62, 64, 67, 64, 57, 57, 67, 62, 64, 67, 64, 67, 57, 66, 62, 62, 57, 67, 0, 62, 64, 67, 64, 59, 59, 57, 0, 62, 64, 67, 64, 74, 66, 67, 62, 64, 67, 64, 59, 57, 66, 62, 57, 67};
-
+    unsigned char notes[] = {64, 66, 67, 67, 57, 77, 0, 64, 64, 66, 67, 62, 74, 74, 57, 0, 64, 64, 66, 67, 64, 67, 57, 66, 64, 62, 64, 64, 66, 67, 0, 64, 62, 57, 57, 57, 59, 57, 67, 57, 59, 67, 57, 57, 57, 59, 57, 62, 8, 64, 66, 67, 64, 57, 59, 57, 0, 62, 64, 67, 64, 59, 59, 57, 62, 64, 67, 64, 57, 57, 67, 62, 64, 67, 64, 67, 57, 66, 62, 62, 57, 67, 0, 62, 64, 67, 64, 59, 59, 57, 0, 62, 64, 67, 64, 74, 66, 67, 62, 64, 67, 64, 59, 57, 66, 62, 57, 67}
     unsigned char durations[] = {16, 16, 16, 16, 16, 16, 16, 8, 8, 8, 16, 16, 16, 16, 16, 8, 16, 16, 16, 16, 16, 16, 16, 32, 16, 16, 16, 16, 16, 32, 8, 32, 32, 16, 16, 16, 16, 32, 32, 16, 16, 16, 16, 16, 16, 16, 16, 8, 8, 16, 16, 16, 16, 16, 16, 32, 32, 8, 8, 8, 8, 16, 16, 32, 8, 8, 8, 8, 16, 16, 16, 8, 8, 8, 8, 32, 16, 16, 16, 16, 16, 16, 16, 16, 16, 8, 8, 8, 8, 32, 16, 8, 8, 8, 8, 32, 16, 16, 16, 16, 16, 16, 16, 16, 16, 8, 8, 8, 8, 32, 16, 8, 8, 8, 8, 16, 8, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8};
-
-    oi_loadSong
+    oi_loadSong(index, numNotes, notes, duration);
+    oi_play_song(index);
+    free(sensor_data);
 }
 
 void playMarioSoundEffect()
 {
     oi_t *sensor_data = oi_alloc();
     oi_init(sensor_data);
-
     int index = 0;
-
     int numNotes = 9;
-    unsigned char notes[] = {
-        84, 83, 81, 79, 78, 76, 79, 78, 76};
-
+    unsigned char notes[] = {84, 83, 81, 79, 78, 76, 79, 78, 76};
     unsigned char durations[] = {8, 8, 16, 16, 16, 32, 16, 16, 32};
-
-    oi_loadSong
+    oi_loadSong(index, numNotes, notes, duration);
+    oi_play_song(index);
+    free(sensor_data);
 }
