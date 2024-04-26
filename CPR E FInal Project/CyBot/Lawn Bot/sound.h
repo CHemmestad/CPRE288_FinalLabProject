@@ -16,5 +16,6 @@ void bumpSound();
 void holeSound();
 void finishSound();
 void startSound();
+void playRickRoll();
 
 #endif /* SOUND_H_ */
