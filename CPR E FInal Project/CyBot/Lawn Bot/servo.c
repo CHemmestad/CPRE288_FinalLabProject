@@ -1,14 +1,10 @@
-#include  "servo.h"
+#include "servo.h"
 #include "Timer.h"
 #include "lcd.h"
 #include "button.h"
 #include "stdio.h"
 
 unsigned long pwm_period = 0x4E200;
-
-long matchVal0;
-long matchVal180;
-
 
 
 void servo_init(){
@@ -32,91 +28,64 @@ void servo_init(){
 }
 
 uint16_t servo_move(uint16_t degrees){
-    float pulseCalculation = (degrees/180.0) + 1.0;
-    //long matchValue = (320000 - (pulseCalculation * 16000));
-    long matchValue = (320000 - (long)(pulseCalculation * 16000));
-
-   // long pulseCalculation = ((degrees/180.0) + 1.0)/;
-
-
-    TIMER1_TBMATCHR_R = matchValue & 0x00FFFF;
-    TIMER1_TBPMR_R = matchValue >> 16;
-
-    TIMER1_CTL_R |= 0x100; //enable timer1b
-    timer_waitMillis(500);
-    TIMER1_CTL_R &= ~0x100;
+    float val_0 = 19.93;          
+    float val_90 = 18.5;      
+    float val_180 = 18.18;
+    double pulseWidth;
+    int matching;
+    double test;
 
 
-    return degrees;
+    float intercept = 0 ;           
+    float slope = ( (val_0 - val_180) / (180));              
+    intercept = val_0;                      
+    float degree1 = degrees;
+
+    pulseWidth = (intercept - slope * degree1) ;    
+
+
+    matching = pulseWidth * 16000;
+
+    TIMER1_TBMATCHR_R = (matching & 0xFFFF);                          
+    TIMER1_TBPMR_R = ((matching >> 16) & 0xFF);  
+
+    timer_waitMillis(20);
 }
 
 void servo_calibrate(){
-    servo_move(90);
+    button_init();
+    double pulseWidth = 19;
+    uint8_t buttonVal;
+    int matching;
+    double val_180 = 0;
+    double val_0 = 0;
 
-    int dir = -1;
-    int cnt = 0;
-    char msg[90];
-    int saveCount = 0;
-    char calVals[90];
+    while(1) {
+        lcd_printf("1:L , 2:R, 3/4:val\nPulse Width: %.2f\n0 value:%.2f\n180 value:%.2f", pulseWidth, val_0, val_180);
+        buttonVal = button_getButton();
 
-    while(1){
-        int button = button_getButton();
-        switch(button){
-        case 1:
-        TIMER1_CTL_R |= 0x100;
-        TIMER1_TBMATCHR_R += 10 * dir;
-        break;
+        switch(buttonVal){
+            case 1:
+            pulseWidth -= 0.01;
+            break;
+            case 2:
+            pulseWidth += 0.01;
+            break;
+            case 3:
+            val_180 = pulseWidth;
+            break;
+            case 4:
+            val_0 = pulseWidth;
+            break;
+        }
+        
 
-        case 2:
-        TIMER1_CTL_R |= 0x100;
-        TIMER1_TBMATCHR_R += 100 * dir;
-        break;
+        matching = pulsewidth * 16000;
+        TIMER1_TBMATCHR_R = (matching & 0xFFFF);                           //Lower 16 Match register - set to low 16 bits of desired val
+        TIMER1_TBPMR_R = ((matching >> 16) & 0xFF);                        //Prescale match register - set to high 8 of desired val
+        timer_waitMillis(20);
 
-        case 3:
-        TIMER1_CTL_R |= 0x100;
-        if(cnt == 0){
-            dir = -1;
-            cnt = 1;
-        }
-        else if(cnt == 1){
-            dir = 1;
-            cnt = 0;
-        }
 
-        break;
-
-        case 4:
-        if(saveCount == 0){
-            matchVal0 = TIMER1_TBMATCHR_R;
-            saveCount++;
-            timer_waitMillis(200);
-        }
-        else if(saveCount == 1){
-            matchVal180 = TIMER1_TBMATCHR_R;
-            saveCount++;
-        }
-        break;
-
-        default:
-        timer_waitMillis(100);
-        TIMER1_CTL_R &= ~0x100;
-        break;
-        }
-
-        if(cnt == 0){
-            sprintf(msg, "Match Value:\n%d \nDirection:\nclockwise", TIMER1_TBMATCHR_R);
-        }
-        else if(cnt == 1){
-            sprintf(msg, "Match Value:\n%ud \nDirection:\nc-clockwise", TIMER1_TBMATCHR_R);
-        }
-        lcd_printf("%s", msg);
-        if(saveCount >= 2){
-            sprintf(calVals, "Calibration Values:\nmatchVal_0: %d\nmatchVal_180: %d", matchVal0, matchVal180);
-            lcd_clear();
-            lcd_printf("%s", calVals);
-            TIMER1_CTL_R &= (~0x100);
-            return;
-        }
     }
 }
 
