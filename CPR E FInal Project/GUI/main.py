@@ -28,7 +28,7 @@ def move_roomba(event):
             angleAdj = angle*-1 + 90
             newAngle = (cybotAngle + 360 + angleAdj)%360
             if distance < 30:
-                leftSensor = canvas_widget.create_oval(
+                canvas_widget.create_oval(
                 (cyBotX + distance*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - 12 - distance*math.cos(math.radians(newAngle)))*gridSize, 
                 (cyBotX + distance*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - 12 - distance*math.cos(math.radians(newAngle)) + 1)*gridSize, 
                 outline="", fill='red')
