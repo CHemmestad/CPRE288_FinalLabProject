@@ -1,92 +1,101 @@
+
 #include "servo.h"
-#include "Timer.h"
-#include "lcd.h"
 #include "button.h"
-#include "stdio.h"
-
-unsigned long pwm_period = 0x4E200;
 
 
-void servo_init(){
-    SYSCTL_RCGCGPIO_R |= 0x02;
-    SYSCTL_RCGCTIMER_R |= 0x02;
-    while ((SYSCTL_PRGPIO_R & 0x02) != 0x02) {};
-    GPIO_PORTB_DIR_R &= ~0x20;
-    GPIO_PORTB_AFSEL_R |= 0x20;
-    GPIO_PORTB_PCTL_R &= 0xFF7FFFFF;
-    GPIO_PORTB_PCTL_R |= 0x00700000;
-    GPIO_PORTB_DEN_R |= 0x20;
+int pulse_period = 20 * 16000; 
 
-    //enable pwm mode
-    TIMER1_CTL_R &= ~0x100; //disable timer1b
-    TIMER1_CFG_R = 0x4; //configure to 16-bit mode
+#define REPLACE_ME 0x00
 
-    TIMER1_TBPR_R = pwm_period >> 16; //extend timer range to 16bit
-    TIMER1_TBILR_R = pwm_period & 0xFFFF; //determine period of pwm
 
-    TIMER1_TBMR_R = 0x0A;//enable pwm / configure for periodic mode.
+void servo_init1(void)
+{
+    unsigned int low_pulse = 0;
+    
+    SYSCTL_RCGCGPIO_R |= 0b0000010;              
+    GPIO_PORTB_AFSEL_R |= 0b00100000;           
+    GPIO_PORTB_PCTL_R &= 0xFF0FFFFF;              
+    GPIO_PORTB_PCTL_R |= 0x00700000;             
+    GPIO_PORTB_DEN_R |= 0b00100000;               
+    GPIO_PORTB_DIR_R |= 0b00100000;               
+ 
+    SYSCTL_RCGCTIMER_R |= 0b000010;            
+    TIMER1_CTL_R &= 0xFEFF;                 
+    TIMER1_CFG_R |= 0x4;                  
+    TIMER1_TBMR_R |= 0b1010;                 
+
+    TIMER1_TBILR_R |= ((pulse_period) & 0xFFFF);          
+    TIMER1_TBPR_R = (((pulse_period) >> 16) & 0xFF);             
+ 
+    TIMER1_TBMATCHR_R = (int)((pulse_period) & 0xFFFF);                 
+    TIMER1_TBPMR_R = (int)(((pulse_period) >> 16) & 0xFF);                       
+
+    TIMER1_CTL_R |= 0x0100;
 }
 
-uint16_t servo_move(uint16_t degrees){
-    float val_0 = 19.93;          
-    float val_90 = 18.5;      
-    float val_180 = 18.18;
-    double pulseWidth;
+void servo_move(uint16_t degree) {
+   
+    float zerodeg = 19.93;         
+    float ninetydeg = 18.5;      
+    float oneeightydeg = 18.18;
+    double pulsewidth;
     int matching;
     double test;
-
-
+    
     float intercept = 0 ;           
-    float slope = ( (val_0 - val_180) / (180));              
-    intercept = val_0;                      
-    float degree1 = degrees;
+    float slope = ( (zerodeg - oneeightydeg) / (180));              
+    intercept = zerodeg;                      
 
-    pulseWidth = (intercept - slope * degree1) ;    
+    pulsewidth = (intercept - slope * (float)degree) ;    
 
+    matching = pulsewidth * 16000;
 
-    matching = pulseWidth * 16000;
+    if(degree == 90){
+        pulsewidth = ninetydeg;
 
-    TIMER1_TBMATCHR_R = (matching & 0xFFFF);                          
-    TIMER1_TBPMR_R = ((matching >> 16) & 0xFF);  
+        matching = pulsewidth * 16000;
 
+        TIMER1_TBMATCHR_R = (matching & 0xFFFF);                           
+        TIMER1_TBPMR_R = ((matching >> 16) & 0xFF);  
+    }
+    else{
+        TIMER1_TBMATCHR_R = (matching & 0xFFFF);                           
+        TIMER1_TBPMR_R = ((matching >> 16) & 0xFF); 
+    }                    
     timer_waitMillis(20);
 }
 
-void servo_calibrate(){
+void servo_calibrate() {
     button_init();
-    double pulseWidth = 19;
-    uint8_t buttonVal;
+    double pulsewidth = 19;
+    uint8_t buttonval;
     int matching;
-    double val_180 = 0;
-    double val_0 = 0;
+    double zeroval = 0;
+    double oneeightyval = 0;
 
     while(1) {
-        lcd_printf("1:L , 2:R, 3/4:val\nPulse Width: %.2f\n0 value:%.2f\n180 value:%.2f", pulseWidth, val_0, val_180);
-        buttonVal = button_getButton();
+        lcd_printf("1:L, 2:R, 3/4:val\nPulse Width: %.2f\n0 value:%.2f\n180 value:%.2f", pulsewidth, zeroval, oneeightyval);
+        buttonval = button_getButton();
 
-        switch(buttonVal){
+        switch(buttonval){
             case 1:
-            pulseWidth -= 0.01;
+            pulsewidth = pulsewidth - 0.01;
             break;
             case 2:
-            pulseWidth += 0.01;
+            pulsewidth = pulsewidth + 0.01;
             break;
             case 3:
-            val_180 = pulseWidth;
+            oneeightyval = pulsewidth;
             break;
             case 4:
-            val_0 = pulseWidth;
+            zeroval = pulsewidth;
             break;
         }
-        
 
         matching = pulsewidth * 16000;
-        TIMER1_TBMATCHR_R = (matching & 0xFFFF);                           //Lower 16 Match register - set to low 16 bits of desired val
-        TIMER1_TBPMR_R = ((matching >> 16) & 0xFF);                        //Prescale match register - set to high 8 of desired val
+        TIMER1_TBMATCHR_R = (matching & 0xFFFF);                           
+        TIMER1_TBPMR_R = ((matching >> 16) & 0xFF);                        \
         timer_waitMillis(20);
-
-
     }
+
 }
-
-
