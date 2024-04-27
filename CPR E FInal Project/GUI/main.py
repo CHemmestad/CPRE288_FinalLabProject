@@ -19,13 +19,13 @@ def move_roomba(event):
     if key == "m":
         s.sendall(key.encode())
         angle = int(s.recv(3))
-        distance = int(s.recv(2))
+        distance = int(s.recv(2)) - 3
         print(angle)
         print(distance)
         while int(angle) < 180:
             offset = 11
             angle = int(s.recv(3))
-            distance = int(s.recv(2)) - 10
+            distance = int(s.recv(2)) - 3
             angleAdj = angle*-1 + 90
             newAngle = (cybotAngle + 360 + angleAdj)%360
             if distance < 30:
@@ -41,10 +41,100 @@ def move_roomba(event):
         s.sendall(key.encode())
     elif key == "w":
         s.sendall(key.encode())
+        hit = s.recv(1).decode()
         cybotAngle = int(s.recv(3))
         distance = int(s.recv(3))/10
         dy = -distance * gridSize * math.cos(math.radians(cybotAngle))  # Move forward
         dx = distance * gridSize * math.sin(math.radians(cybotAngle)) 
+        if hit == '0':
+            adj = 15
+            angleAdj = -68
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='white')
+        elif hit == '1':
+            adj = 15
+            angleAdj = -20
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='white')
+        elif hit == '2':
+            adj = 15
+            angleAdj = 20
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='white')
+        elif hit == '3':
+            adj = 15
+            angleAdj = 68
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='white')
+        elif hit == '4':
+            adj = 15
+            angleAdj = -68
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='black')
+        elif hit == '5':
+            adj = 15
+            angleAdj = -20
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='black')
+        elif hit == '6':
+            adj = 15
+            angleAdj = 20
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='black')
+        elif hit == '7':
+            adj = 15
+            angleAdj = 68
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='black')
+        elif hit == '8':
+            adj = 17
+            angleAdj = 0
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='red')
+        elif hit == '9':
+            adj = 17
+            angleAdj = -45
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='red')
+        elif hit == 'a':
+            adj = 17
+            angleAdj = 45
+            newAngle = (cybotAngle + 360 + angleAdj)%360
+            canvas_widget.create_oval(
+                (cyBotX + adj*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + adj*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - adj*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                outline="", fill='red')
+
     elif key == "a":
         s.sendall(key.encode())
         cybotAngle = int(s.recv(3))
@@ -174,6 +264,8 @@ cybotAngle = 0.0
 sensorAngle = 0.0
 cyBotX = 27
 cyBotY = 273
+cyBotX = 40
+cyBotY = 260
 
 # 0 = empty, 1 = boundary, 2 = object, 3 = center of bot
 """
