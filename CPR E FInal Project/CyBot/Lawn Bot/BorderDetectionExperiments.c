@@ -155,7 +155,7 @@ double moveBackwardBorder(oi_t *sensor_data, double distance_mm){
     return sum;
 }
 
-void moveForwardWithDetect(oi_t *sensor_data, double distance_mm){
+double moveForwardWithDetect(oi_t *sensor_data, double distance_mm){
     double sum = 0; // distance member in oi_t struct is type double
     oi_setWheels(250,250); //move forward at full speed
 
@@ -166,57 +166,57 @@ void moveForwardWithDetect(oi_t *sensor_data, double distance_mm){
             oi_setWheels(0,0);
             char send = '0';
             uart_sendChar(send);
-            return;
+            return sum;
         } else if(sensor_data -> cliffFrontLeftSignal > 2400) {
             oi_setWheels(0,0);
             char send = '1';
             uart_sendChar(send);
-            return;
+            return sum;
         }  else if(sensor_data -> cliffFrontRightSignal > 2400) {
             oi_setWheels(0,0);
             char send = '2';
             uart_sendChar(send);
-            return;
+            return sum;
         }  else if(sensor_data -> cliffRightSignal > 2400) {
             oi_setWheels(0,0);
             char send = '3';
             uart_sendChar(send);
-            return;
+            return sum;
         }  else if(sensor_data -> cliffLeftSignal < 100) {
             oi_setWheels(0,0);
             char send = '4';
             uart_sendChar(send);
-            return;
+            return sum;
         } else if(sensor_data -> cliffFrontLeftSignal < 100) {
             oi_setWheels(0,0);
             char send = '5';
             uart_sendChar(send);
-            return;
+            return sum;
         }  else if(sensor_data -> cliffFrontRightSignal < 100) {
             oi_setWheels(0,0);
             char send = '6';
             uart_sendChar(send);
-            return;
+            return sum;
         }  else if(sensor_data -> cliffRightSignal < 100) {
             oi_setWheels(0,0);
             char send = '7';
             uart_sendChar(send);
-            return;
+            return sum;
         } if(sensor_data -> bumpLeft && sensor_data -> bumpRight) {
             oi_setWheels(0,0);
             char send = '8';
             uart_sendChar(send);
-            return;
+            return sum;
         } else if(sensor_data -> bumpLeft) {
             oi_setWheels(0,0);
             char send = '9';
             uart_sendChar(send);
-            return;
+            return sum;
         }  else if(sensor_data -> bumpRight) {
             oi_setWheels(0,0);
             char send = 'a';
             uart_sendChar(send);
-            return;
+            return sum;
         }
 
         sum += sensor_data -> distance; // use -> notation since pointer
