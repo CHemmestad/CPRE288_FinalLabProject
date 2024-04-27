@@ -18,44 +18,46 @@ def move_roomba(event):
     dx, dy = 0, 0
     if key == "m":
         s.sendall(key.encode())
-        angle = s.recv(3)
-        distance = s.recv(2)
-        print(angle.decode())
-        print(distance.decode())
+        angle = int(s.recv(3))
+        distance = int(s.recv(2))
+        print(angle)
+        print(distance)
         while int(angle) < 180:
+            offset = 11
             angle = int(s.recv(3))
-            distance = int(s.recv(2))
+            distance = int(s.recv(2)) - 10
             angleAdj = angle*-1 + 90
             newAngle = (cybotAngle + 360 + angleAdj)%360
             if distance < 30:
                 canvas_widget.create_oval(
-                (cyBotX + distance*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - 12 - distance*math.cos(math.radians(newAngle)))*gridSize, 
-                (cyBotX + distance*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - 12 - distance*math.cos(math.radians(newAngle)) + 1)*gridSize, 
+                (cyBotX + offset*math.sin(math.radians(cybotAngle)) + 4*math.sin(math.radians(newAngle)) + distance*math.sin(math.radians(newAngle)))*gridSize, (cyBotY - offset*math.cos(math.radians(cybotAngle)) - 4*math.cos(math.radians(newAngle)) - distance*math.cos(math.radians(newAngle)))*gridSize, 
+                (cyBotX + offset*math.sin(math.radians(cybotAngle)) + 4*math.sin(math.radians(newAngle)) + distance*math.sin(math.radians(newAngle)) + 1)*gridSize, (cyBotY - offset*math.cos(math.radians(cybotAngle)) - 4*math.cos(math.radians(newAngle)) - distance*math.cos(math.radians(newAngle)) + 1)*gridSize, 
                 outline="", fill='red')
             print(angle)
             print(distance)
     elif key == "p":
         s.sendall(key.encode())
+    elif key == "c":
+        s.sendall(key.encode())
     elif key == "w":
         s.sendall(key.encode())
+        cybotAngle = int(s.recv(3))
         distance = int(s.recv(3))/10
         dy = -distance * gridSize * math.cos(math.radians(cybotAngle))  # Move forward
         dx = distance * gridSize * math.sin(math.radians(cybotAngle)) 
     elif key == "a":
         s.sendall(key.encode())
-        cybotAngle = (cybotAngle - int(s.recv(3))) # turns left
-        if cybotAngle < 0:
-            cybotAngle = 360
+        cybotAngle = int(s.recv(3))
     elif key == "s":
         s.sendall(key.encode())
-        distance = int(s.recv(3))/10
+        cybotAngle = int(s.recv(3))
+        distance = int(s.recv(3))/-10
         dy = distance * gridSize * math.cos(math.radians(cybotAngle))   # Move backward
         dx = -distance * gridSize * math.sin(math.radians(cybotAngle)) 
     elif key == "d":
         s.sendall(key.encode())
-        cybotAngle = (cybotAngle - int(s.recv(3)))%360  # turns right
-    elif key == "space":
-        canvas_widget.create_oval((cyBotX*gridSize)-10 + 1, (cyBotY*gridSize)-10, (cyBotX*gridSize)+10 + 1, (cyBotY*gridSize)+10, outline="", fill='red')
+        cybotAngle = int(s.recv(3))
+        #cybotAngle = (cybotAngle - int(s.recv(3)))%360  # turns right
     print(cybotAngle)
     canvas_widget.delete(direction)
     canvas_widget.delete(leftSensor)
@@ -157,12 +159,12 @@ radius = 5
 center = (50, 50)
 
 # Draw the circle in the canvas
-
 for i in range(rows):
     for j in range(cols):
         if (i - center[0])**2 + (j - center[1])**2 <= radius**2:
             canvas[i][j] = 1
 """
+
 # flags for later
 moving = 0
 scanning = 0
@@ -174,6 +176,7 @@ cyBotX = 27
 cyBotY = 273
 
 # 0 = empty, 1 = boundary, 2 = object, 3 = center of bot
+"""
 canvas[10][10] = 1
 canvas[11][11] = 1
 canvas[12][11] = 2
@@ -183,12 +186,12 @@ canvas[146][190] = 2
 canvas[146][210] = 2
 canvas[166][190] = 2
 canvas[1][1] = 2
+"""
 canvas[cyBotY][cyBotX] = 3 # The center of the bots current location
-canvas[rows - 1][cols - 1] = 2
 gridSize = 3
 
 # Need to measure the actaul radius of the bot still
-botRadius = (36/2) # Each grid represents a 1x1cm block and the radius of the bot is 34/2cm
+botRadius = (34/2) # Each grid represents a 1x1cm block and the radius of the bot is 34/2cm
 
 # Create the GUI window
 root = tk.Tk()
@@ -201,12 +204,14 @@ canvas_widget.pack()
 # Draw the circles on the canvas
 for i in range(rows):
     for j in range(cols):
+        """
         if canvas[i][j] == 1:
             color = "white"
             canvas_widget.create_oval(j*gridSize, i*gridSize, (j+1)*gridSize, (i+1)*gridSize, outline="", fill=color)
         if canvas[i][j] == 2:
             color = "red"
             canvas_widget.create_oval(j*gridSize, i*gridSize, (j+1)*gridSize, (i+1)*gridSize, outline="", fill=color)
+            """
         if canvas[i][j] == 3:
             color = "black"
             roomba = canvas_widget.create_oval((j - botRadius)*gridSize, (i - botRadius)*gridSize, (j + botRadius + 1)*gridSize, (i + botRadius + 1)*gridSize, outline="", fill=color)
