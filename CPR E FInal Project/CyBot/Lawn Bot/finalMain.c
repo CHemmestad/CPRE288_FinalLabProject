@@ -12,12 +12,14 @@
 #include "movement.h"
 #include "Timer.h"
 #include "lcd.h"
-#include "cyBot_uart.h"
-#include "cyBot_Scan.h"
 #include "sound.h"
 #include "imu.h"
 #include "i2c.h"
 #include "bno055.h"
+#include "servo.h"
+#include "uart.h"
+#include "adc.h"
+#include "button.h"
 
 typedef struct Object{
     int number;
@@ -47,7 +49,7 @@ int findSmallest(Object object[], int objects) {
 void printString(char string[]) {
     int j;
     for(j = 0; j < strlen(string); j++) {
-        cyBot_sendByte(string[j]);
+        uart_sendChar(string[j]);
     }
 }
 
@@ -99,16 +101,15 @@ int objectLeft(int prev, int current) {
     }
 }
 
-float getAverage(cyBOT_Scan_t* data, int angle) {
-    float average = 0;
-    int i = 0;
-    for(; i < 4; i++) {
-        cyBOT_Scan(angle, data);
-        average += data->IR_raw_val;
-    }
-    average = average/4;
-    return average;
-}
+//float getAverage(int angle) {
+//    float average = 0;
+//    int i = 0;
+//    for(; i < 4; i++) {
+//        average += adc_read();
+//    }
+//    average = average/4;
+//    return average;
+//}
 
 void calculateLinearWidth(Object object[], int i) {
     object[i].linearWidth = 2 * 3.1415 * object[i].closestDistance * (object[i].angularWidth / 360.00);
@@ -171,35 +172,40 @@ int calculateDistance(int value) {
 int main(void) {
     oi_t *sensor_data = oi_alloc();
     oi_init(sensor_data);
-    lcd_init();
     timer_init();
-    cyBot_uart_init();
-    cyBOT_init_Scan(0b0111);
+    lcd_init();
+    bno_init();
+    adc_init();
+    uart_init();
+    servo_init();
     imu_init();
     imu_writeReg(IMU_OPR_MODE, NDOF);
 //    imu_setMode(MAGONLY);
     imu_setDefaultUnits();
-    bno_init();
+
     bno_t* bno = bno_alloc();
 
 //    cyBOT_SERVO_cal();
-    right_calibration_value = 248500;
-    left_calibration_value = 1167250;
+//    servo_calibrate();
+//    right_calibration_value = 248500;
+//    left_calibration_value = 1167250;
 
     oi_setWheels(0,0); //stop
 
-    cyBOT_Scan_t* data = calloc(1, sizeof(cyBOT_Scan_t));
+//    cyBOT_Scan_t* data = calloc(1, sizeof(cyBOT_Scan_t));
     float heading;
-    int adj = 0;
+    float adj = 0;
 //    mag_t* mag;
 //    mag = imu_getMag();
 
     while(1) {
-        char character = (char)cyBot_getByte();
+        char character = (char)uart_receive();
         if(character == 'm') {
             int i = 0;
+            servo_move2(i);
+            timer_waitMillis(1000);
             for(; i <= 180; i += 2) {
-                cyBOT_Scan(i, data);
+                servo_move2(i);
         //        cyBot_sendByte(i);
         //        cyBot_sendByte(calculateDistance(data->IR_raw_val));
                 char angle[3];
@@ -207,7 +213,7 @@ int main(void) {
                 sprintf(angle, "%3d", i);
                 printString(angle);
                 char distance[2];
-                sprintf(distance, "%2d", calculateDistance(data->IR_raw_val));
+                sprintf(distance, "%2d", (int)calculateDistance(adc_read()));
                 printString(distance);
             }
         }
@@ -216,10 +222,11 @@ int main(void) {
 //            playRickRoll();
         }
         if(character == 'w') {
-            int distance = (int)moveForward(sensor_data, 30);
+            int distance = (int)moveForwardWithDetect(sensor_data, 30);
             bno_update(bno);
             heading = (bno->euler.heading / 16.0);
             heading -= adj;
+            lcd_printf("%f", heading);
             if(heading < 0) {
                 heading = (int)(heading + 360) % 360;
             }
