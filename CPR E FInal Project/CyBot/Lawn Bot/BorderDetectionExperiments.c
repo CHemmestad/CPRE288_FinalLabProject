@@ -222,7 +222,8 @@ double moveForwardWithDetect(oi_t *sensor_data, double distance_mm){
         sum += sensor_data -> distance; // use -> notation since pointer
         sensor_data -> distance = 0;
     }
-
+    char send = '!';
+    uart_sendChar(send);
     oi_setWheels(0,0);
     return;
 }
